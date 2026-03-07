@@ -547,7 +547,7 @@
         }
 
         const loader = new GLTFLoader();
-        loader.load('C14H19NO2_final.glb', (gltf) => {
+        loader.load('steel_model.glb', (gltf) => {
             const model = gltf.scene;
 
             // Center model
@@ -693,8 +693,8 @@
         // ═══════════════════════════════════════════
         window.exportModel = () => {
             const link = document.createElement('a');
-            link.href = 'C14H19NO2_final.glb';
-            link.download = 'C14H19NO2_final.glb';
+            link.href = 'steel_model.glb';
+            link.download = 'steel_model.glb';
             link.click();
             const toast = document.getElementById('exportToast');
             toast.classList.add('show');
