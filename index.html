@@ -179,22 +179,59 @@
       background: rgba(0, 0, 20, .75);
       border: 1px solid rgba(255, 255, 255, .08);
       border-radius: 12px;
-      padding: 14px 18px;
+      padding: 18px 22px;
       backdrop-filter: blur(12px);
       z-index: 10;
-      font-size: 12px;
+      font-size: clamp(14px, 1.1vw, 18px);
       color: rgba(255, 255, 255, .5);
-      max-width: 240px
+      max-width: 340px;
+      transition: transform .3s ease, opacity .3s ease
     }
 
     .info-panel .val {
       color: #0ff;
       font-weight: 700;
+      font-size: clamp(15px, 1.2vw, 20px);
       font-family: 'Orbitron', sans-serif
     }
 
     .info-panel .row {
-      margin: 3px 0
+      margin: 4px 0
+    }
+
+    /* Mobile info toggle button */
+    .info-toggle {
+      display: none;
+      position: fixed;
+      bottom: 75px;
+      right: 12px;
+      z-index: 11;
+      background: rgba(0, 255, 255, .1);
+      border: 1px solid rgba(0, 255, 255, .4);
+      color: #0ff;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      backdrop-filter: blur(10px);
+      transition: all .25s;
+      align-items: center;
+      justify-content: center
+    }
+
+    .info-toggle:hover {
+      background: rgba(0, 255, 255, .2);
+      box-shadow: 0 0 15px rgba(0, 255, 255, .3)
+    }
+
+    .info-toggle .arrow {
+      display: inline-block;
+      transition: transform .3s ease
+    }
+
+    .info-toggle.open .arrow {
+      transform: rotate(180deg)
     }
 
 
@@ -285,9 +322,26 @@
     /* Responsive */
     @media(max-width:700px) {
 
-      .legend,
-      .info-panel {
+      .legend {
         display: none
+      }
+
+      .info-panel {
+        bottom: 120px;
+        right: 12px;
+        font-size: 13px;
+        max-width: 200px;
+        padding: 12px 14px
+      }
+
+      .info-panel.hidden-mobile {
+        transform: translateX(calc(100% + 20px));
+        opacity: 0;
+        pointer-events: none
+      }
+
+      .info-toggle {
+        display: flex
       }
 
       .controls {
@@ -344,6 +398,10 @@
     <div class="row" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.3)">🖱️ Drag = roție · Scroll = zoom ·
       Right-drag = pan</div>
   </div>
+
+  <button class="info-toggle" id="infoToggle" onclick="toggleInfoPanel()">
+    <span class="arrow">◀</span>
+  </button>
 
 
 
@@ -734,11 +792,18 @@
       styleMode = (styleMode + 1) % 3;
       atomMeshes.forEach(m => {
         const baseR = ATOM_RADII[m.userData.element] || 0.35;
+        // Skip hidden hydrogens
+        if (!showHydrogens && m.userData.element === 'H') return;
         if (styleMode === 0) m.scale.setScalar(baseR);
         else if (styleMode === 1) m.scale.setScalar(baseR * 2.5); // Space-filling
         else m.scale.setScalar(baseR * 0.4);
       });
       bondCylinders.forEach(c => {
+        // If hydrogen bonds and hydrogens are hidden, keep them hidden
+        if (c.userData.hasHydrogen && !showHydrogens) {
+          c.visible = false;
+          return;
+        }
         if (styleMode === 1) c.visible = false;
         else c.visible = true;
       });
@@ -748,8 +813,23 @@
       showHydrogens = !showHydrogens;
       hydrogenMeshes.forEach(m => { m.visible = showHydrogens; });
       bondCylinders.forEach(c => {
-        if (c.userData.hasHydrogen) c.visible = showHydrogens;
+        if (c.userData.hasHydrogen) {
+          // When showing hydrogens, respect current style mode
+          if (showHydrogens) {
+            c.visible = (styleMode !== 1); // Hidden in space-fill mode
+          } else {
+            c.visible = false;
+          }
+        }
       });
+    };
+
+    // Mobile info panel toggle
+    window.toggleInfoPanel = () => {
+      const panel = document.querySelector('.info-panel');
+      const btn = document.getElementById('infoToggle');
+      panel.classList.toggle('hidden-mobile');
+      btn.classList.toggle('open');
     };
 
     // ═══════════════════════════════════════════
