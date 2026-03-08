@@ -854,8 +854,6 @@
             styleMode = (styleMode + 1) % 3;
             atomMeshes.forEach(m => {
                 const baseR = ATOM_RADII[m.userData.element] || 0.35;
-                // Skip hidden hydrogens
-                if (!showHydrogens && m.userData.element === 'H') return;
                 if (styleMode === 0) m.scale.setScalar(baseR);
                 else if (styleMode === 1) m.scale.setScalar(baseR * 2.5); // Space-filling
                 else m.scale.setScalar(baseR * 0.4);
@@ -873,7 +871,15 @@
 
         window.toggleHydrogens = () => {
             showHydrogens = !showHydrogens;
-            hydrogenMeshes.forEach(m => { m.visible = showHydrogens; });
+            hydrogenMeshes.forEach(m => {
+                m.visible = showHydrogens;
+                if (showHydrogens) {
+                    const baseR = ATOM_RADII[m.userData.element] || 0.35;
+                    if (styleMode === 0) m.scale.setScalar(baseR);
+                    else if (styleMode === 1) m.scale.setScalar(baseR * 2.5); // Space-filling
+                    else m.scale.setScalar(baseR * 0.4);
+                }
+            });
             bondCylinders.forEach(c => {
                 if (c.userData.hasHydrogen) {
                     if (showHydrogens) {
