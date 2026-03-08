@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Molecular Viewer — Kevlar & Steel</title>
+    <title>3D Molecular Viewer — Kevlar, Steel & Nylon</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap');
 
@@ -212,6 +212,13 @@
                 0 0 40px rgba(120, 0, 255, 0.12)
         }
 
+        .card.nylon:hover {
+            border-color: rgba(0, 255, 120, 0.3);
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(0, 255, 120, 0.12)
+        }
+
         /* Card icon area */
         .card-icon {
             width: 80px;
@@ -237,6 +244,12 @@
             box-shadow: 0 0 30px rgba(120, 0, 255, 0.08)
         }
 
+        .nylon .card-icon {
+            background: linear-gradient(135deg, rgba(0, 255, 120, 0.12), rgba(0, 200, 80, 0.06));
+            border: 1px solid rgba(0, 255, 120, 0.2);
+            box-shadow: 0 0 30px rgba(0, 255, 120, 0.08)
+        }
+
         .card-title {
             font-family: 'Orbitron', sans-serif;
             font-size: clamp(20px, 2.5vw, 26px);
@@ -251,6 +264,10 @@
 
         .steel .card-title {
             color: #a855f7
+        }
+
+        .nylon .card-title {
+            color: #34d399
         }
 
         .card-formula {
@@ -295,6 +312,10 @@
             color: #a855f7
         }
 
+        .nylon .meta-val {
+            color: #34d399
+        }
+
         .meta-item .meta-label {
             font-size: 10px;
             color: rgba(255, 255, 255, 0.3);
@@ -337,6 +358,17 @@
         .steel:hover .card-btn {
             background: rgba(120, 0, 255, 0.2);
             box-shadow: 0 0 20px rgba(120, 0, 255, 0.2)
+        }
+
+        .nylon .card-btn {
+            background: rgba(0, 255, 120, 0.1);
+            border: 1px solid rgba(0, 255, 120, 0.3);
+            color: #34d399
+        }
+
+        .nylon:hover .card-btn {
+            background: rgba(0, 255, 120, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 120, 0.2)
         }
 
         .card-btn .arrow {
@@ -428,6 +460,30 @@
                     </div>
                     <div class="meta-item">
                         <span class="meta-val">2</span>
+                        <span class="meta-label">inele</span>
+                    </div>
+                </div>
+                <div class="card-btn">DESCHIDE MODELUL <span class="arrow">→</span></div>
+            </a>
+
+            <!-- Nylon Card -->
+            <a href="index_nylon.html" class="card nylon">
+                <div class="card-icon">🧵</div>
+                <div class="card-title">NYLON</div>
+                <div class="card-formula">[C₆H₁₁NO]ₙ</div>
+                <div class="card-desc">Policaprolactamă (Nylon-6) — polimer sintetic din familia poliamidelor. Folosit
+                    în fibre textile, angrenaje și componente mecanice.</div>
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <span class="meta-val">113.16</span>
+                        <span class="meta-label">g/mol</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-val">38</span>
+                        <span class="meta-label">atomi</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-val">0</span>
                         <span class="meta-label">inele</span>
                     </div>
                 </div>
