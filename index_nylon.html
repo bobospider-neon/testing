@@ -381,15 +381,15 @@
 <body>
     <div id="loading">
         <div class="spinner"></div>
-        <p>LOADING NYLON STRUCTURE...</p>
+        <p>SE ÎNCARCĂ STRUCTURA NYLON...</p>
     </div>
     <div id="canvas-container"></div>
     <div id="tooltip"></div>
-    <div class="export-toast" id="exportToast">✅ Download Complete!</div>
+    <div class="export-toast" id="exportToast">✅ Descărcare Completă!</div>
 
     <div class="ui-overlay title-bar">
         <div>
-            <a href="index.html" class="back-btn">
+            <a href="molecule.html" class="back-btn">
                 <span class="arrow">◀</span> INAPOI
             </a>
             <h1>NYLON 3D</h1>
@@ -431,24 +431,12 @@
         <button class="btn" onclick="toggleSpin()">⟳ AUTO ROTIRE</button>
         <button class="btn" onclick="toggleStyle()">◉ STIL</button>
         <button class="btn" onclick="toggleHydrogens()">H HIDROGENI</button>
-        <button class="btn primary" onclick="exportModel()">⬇ DOWNLOAD 3D MODEL</button>
     </div>
+<!-- Three.js r128 UMD — compatibil Firefox Reality (Gecko 68+) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
-    <script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
-  }
-}
-</script>
-
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+  <script>
 
         // ═══════════════════════════════════════════
         // NYLON-6 (Polycaprolactam) Molecular Structure
@@ -656,17 +644,17 @@
         camera.position.set(6, 5, 18);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.2;
-        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.outputEncoding = THREE.sRGBEncoding;
         container.appendChild(renderer.domElement);
 
         scene.background = new THREE.Color(0x050510);
         scene.fog = new THREE.FogExp2(0x050510, 0.008);
 
-        const controls = new OrbitControls(camera, renderer.domElement);
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.06;
         controls.autoRotate = true;
@@ -698,14 +686,7 @@
         pointLight2.position.set(10, -5, -5);
         scene.add(pointLight2);
 
-        // Post-processing bloom
-        const composer = new EffectComposer(renderer);
-        composer.addPass(new RenderPass(scene, camera));
-        const bloomPass = new UnrealBloomPass(
-            new THREE.Vector2(window.innerWidth, window.innerHeight),
-            0.3, 0.4, 0.85
-        );
-        composer.addPass(bloomPass);
+        // Bloom dezactivat — incompatibil cu r128 UMD pe Firefox Reality
 
         // ═══════════════════════════════════════════
         // BUILD 3D MOLECULE MESH
@@ -899,19 +880,6 @@
         };
 
         // ═══════════════════════════════════════════
-        // DOWNLOAD 3D MODEL
-        // ═══════════════════════════════════════════
-        window.exportModel = () => {
-            const link = document.createElement('a');
-            link.href = 'nylon_model.glb';
-            link.download = 'nylon_model.glb';
-            link.click();
-            const toast = document.getElementById('exportToast');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
-        };
-
-        // ═══════════════════════════════════════════
         // ANIMATION LOOP
         // ═══════════════════════════════════════════
         function animate() {
@@ -926,7 +894,7 @@
             pointLight.position.z = Math.cos(t * 0.7) * 5;
             pointLight2.position.y = Math.sin(t * 0.5) * 5;
 
-            composer.render();
+            renderer.render(scene, camera);
         }
 
         // Hide loading & start
@@ -938,7 +906,6 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            composer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
 </body>

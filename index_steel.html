@@ -316,32 +316,6 @@
             box-shadow: 0 0 15px rgba(0, 255, 255, .15)
         }
 
-        .export-toast {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: rgba(0, 255, 255, .12);
-            border: 1px solid #0ff;
-            color: #fff;
-            padding: 20px 36px;
-            border-radius: 14px;
-            font-size: 16px;
-            z-index: 50;
-            opacity: 0;
-            pointer-events: none;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 0 40px rgba(0, 255, 255, .2);
-            transition: all .35s ease;
-            letter-spacing: 1px;
-            font-weight: 600
-        }
-
-        .export-toast.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1)
-        }
-
         @media(max-width:700px) {
             .legend {
                 display: none
@@ -381,15 +355,15 @@
 <body>
     <div id="loading">
         <div class="spinner"></div>
-        <p>LOADING MOLECULAR STRUCTURE...</p>
+        <p>SE ÎNCARCĂ STRUCTURA MOLECULARĂ...</p>
     </div>
     <div id="canvas-container"></div>
     <div id="tooltip"></div>
-    <div class="export-toast" id="exportToast">✅ Download Complete!</div>
+
 
     <div class="ui-overlay title-bar">
         <div>
-            <a href="index.html" class="back-btn">
+            <a href="molecule.html" class="back-btn">
                 <span class="arrow">◀</span> INAPOI
             </a>
             <h1>STEEL 3D</h1>
@@ -431,24 +405,15 @@
         <button class="btn" onclick="toggleSpin()">⟳ AUTO ROTIRE</button>
         <button class="btn" onclick="toggleStyle()">◉ STIL</button>
         <button class="btn" onclick="toggleHydrogens()">H HIDROGENI</button>
-        <button class="btn primary" onclick="exportModel()">⬇ DOWNLOAD 3D MODEL</button>
+
     </div>
 
-    <script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
-  }
-}
-</script>
+    <!-- Three.js r128 UMD — compatibil Firefox Reality (Gecko 68+) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    <script>
+        /* ─── fara importmap, fara ESM, fara postprocessing bloom ─── */
 
         // ═══════════════════════════════════════════
         // STEEL MOLECULE: C₁₄H₁₉NO₂
@@ -529,17 +494,17 @@
         camera.position.set(6, 5, 18);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.2;
-        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.outputEncoding = THREE.sRGBEncoding;
         container.appendChild(renderer.domElement);
 
         scene.background = new THREE.Color(0x050510);
         scene.fog = new THREE.FogExp2(0x050510, 0.008);
 
-        const controls = new OrbitControls(camera, renderer.domElement);
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.06;
         controls.autoRotate = true;
@@ -547,12 +512,10 @@
         controls.minDistance = 4;
         controls.maxDistance = 60;
 
-        // Rich Lighting Setup
         scene.add(new THREE.AmbientLight(0x404060, 0.7));
 
         const dirLight = new THREE.DirectionalLight(0xffffff, 2.5);
         dirLight.position.set(10, 15, 12);
-        dirLight.castShadow = true;
         scene.add(dirLight);
 
         const dirLight2 = new THREE.DirectionalLight(0x4488ff, 1.0);
@@ -571,14 +534,7 @@
         pointLight2.position.set(10, -5, -5);
         scene.add(pointLight2);
 
-        // Post-processing bloom
-        const composer = new EffectComposer(renderer);
-        composer.addPass(new RenderPass(scene, camera));
-        const bloomPass = new UnrealBloomPass(
-            new THREE.Vector2(window.innerWidth, window.innerHeight),
-            0.3, 0.4, 0.85
-        );
-        composer.addPass(bloomPass);
+        // Bloom dezactivat — incompatibil cu r128 UMD pe Firefox Reality
 
         // ═══════════════════════════════════════════
         // BUILD 3D MOLECULE MESH (same approach as Kevlar)
@@ -590,11 +546,9 @@
         const hydrogenMeshes = [];
         const bondCylinders = [];
 
-        // Shared geometry (instanced for performance)
-        const sphereGeo = new THREE.SphereGeometry(1, 64, 64);
-        const cylinderGeo = new THREE.CylinderGeometry(1, 1, 1, 32, 1);
+        const sphereGeo = new THREE.SphereGeometry(1, 32, 24);
+        const cylinderGeo = new THREE.CylinderGeometry(1, 1, 1, 16, 1);
 
-        // Material cache (shared per element)
         const matCache = {};
         function getAtomMaterial(el) {
             if (!matCache[el]) {
@@ -773,19 +727,6 @@
         };
 
         // ═══════════════════════════════════════════
-        // DOWNLOAD 3D MODEL
-        // ═══════════════════════════════════════════
-        window.exportModel = () => {
-            const link = document.createElement('a');
-            link.href = 'steel_model.glb';
-            link.download = 'steel_model.glb';
-            link.click();
-            const toast = document.getElementById('exportToast');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
-        };
-
-        // ═══════════════════════════════════════════
         // ANIMATION LOOP
         // ═══════════════════════════════════════════
         function animate() {
@@ -800,7 +741,7 @@
             pointLight.position.z = Math.cos(t * 0.7) * 5;
             pointLight2.position.y = Math.sin(t * 0.5) * 5;
 
-            composer.render();
+            renderer.render(scene, camera);
         }
 
         // Hide loading & start
@@ -812,7 +753,6 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            composer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
 </body>
